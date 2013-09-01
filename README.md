@@ -14,4 +14,4 @@
 
 #### スクリーンショット
 
-![美人百景](https://raw.github.com/shoito/bihyaku-chrome-webapps/master/elements/ss0.png)
+![美人百景](https://raw.github.com/shoito/bihyaku-chrome-webapps/master/elements/ss00.jpg)
