@@ -1,0 +1,51 @@
+<!doctype html>
+<html prefix="og: http://ogp.me/ns#" lang="ja">
+<head profile="http://gmpg.org/xfn/11">
+    <meta charset="utf-8">
+    <title>美人百景</title>
+    <meta name="description" content="美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。" />
+    <meta name="google-site-verification" content="89dndC9nTh473XkgXKC6WWh4c-T0NW9DbX2C4XcV5rw" />
+    <meta property="og:title" content="美人百景">
+    <meta property="og:type" content="website">
+    <meta property="og:description" content="美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。">
+    <meta property="og:url" content="http://bihyaku.appspot.com/">
+    <meta property="og:image" content="http://bihyaku.appspot.com/images/icon-256.png">
+    <meta property="og:site_name" content="美人百景">
+    <meta name="application-name" content=" 美人百景" />
+    <meta name="msapplication-TileColor" content=" #ff2f92" />
+    <meta name="msapplication-square70x70logo" content="images/icon-70.png" />
+    <meta name="msapplication-square150x150logo" content="images/icon-150.png" />
+    <meta name="msapplication-wide310x150logo" content="images/icon-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="images/icon-310.png" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="components/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="styles/main.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>今日の美人百景<small class="js-today"></small></h1>
+    </header>
+    <section id="controls">
+        <a href="#" id="reload"><i class="icon-repeat"></i></a>
+    </section>
+    <section id="loading">
+        <img src="images/loading.gif">
+    </section>
+    <section id="photos-container">
+        <ul id="photos"></ul>
+    </section>
+    <footer>
+        <span>powerd by <a href="http://bjin.me/" target="_blank">Bjin.Me</a></span>
+    </footer>
+
+    <script src="components/jquery/jquery.js"></script>
+    <script src="components/eventEmitter/EventEmitter.js"></script>
+    <script src="components/eventie/eventie.js"></script>
+    <script src="components/imagesloaded/imagesloaded.js"></script>
+    <script src="scripts/jquery.wookmark.js"></script>
+    <!-- build:js scripts/bijin.js -->
+    <script src="scripts/bijin.js"></script>
+    <!-- endbuild -->
+</body>
+</html>

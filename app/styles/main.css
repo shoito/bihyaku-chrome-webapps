@@ -1,0 +1,111 @@
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+body {
+    /*font-family: "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif;*/
+    font-family: "MS PMincho", "ＭＳ Ｐ明朝", "MS Mincho", "ＭＳ 明朝", serif; 
+    font-size: 13px;
+    width: 100%;
+    background-color: #e9e9e9;
+}
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 4px;
+}
+h1 {
+    font-size: 1.3em;
+}
+h2 {
+    font-size: 1.2em;
+}
+h3 {
+    font-size: 1.1em;
+}
+h4, h5, h6 {
+    font-size: 1em;
+}
+ul {
+    list-style: none;
+}
+p {
+    font-size: 1em;
+    margin: 0.6em 0;
+    color: #333;
+}
+i {
+    margin-left: 4px;
+}
+footer {
+    color: #222;
+    text-align: right;
+    margin: 2px 12px;
+}
+footer a {
+    color: #222;
+}
+
+header h1 {
+    color: #333;
+    text-align: center;
+    font-size: 3em;
+    font-weight: bold;
+}
+
+header h1 small {
+    color: #666;
+    margin-left: 12px;
+    font-size: 0.6em;
+    font-weight: normal;
+}
+
+#controls {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+}
+#controls a {
+    color: #333;
+    text-decoration: none;
+}
+#controls i {
+    font-size: 2em;
+}
+#photos-container {
+    position: relative;
+    margin-top: 12px;
+    /*opacity: 0.1;*/
+}
+
+#photos li {
+    background-color: #ffffff;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    padding: 5px;
+    border: 1px solid #dedede;
+    box-sizing: border-box;
+}
+
+#photos li img {
+    display: block;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    width: 100%;
+    height: auto;
+}
+
+#loading {
+    display: none;
+    height: 80px;
+    width: 80px;
+    text-align: center;
+    position:absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -40px;
+    margin-left: -40px;
+}
