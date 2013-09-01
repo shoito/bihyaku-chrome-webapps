@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "美人百景",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。",
+    "description": "The description of the application"
+  }
+}
