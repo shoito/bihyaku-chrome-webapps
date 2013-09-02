@@ -201,11 +201,11 @@ module.exports = (grunt) ->
             "images/{,*/}*.{webp,gif}"
             "_locales/{,*/}*.json"
             "scripts/{,*/}*.js"
-            "components/jquery/jquery.js"
-            "components/eventEmitter/EventEmitter.js"
-            "components/eventie/eventie.js"
-            "components/imagesloaded/imagesloaded.js"
-            "components/font-awesome/css/font-awesome.css"
+            "components/jquery/*.js"
+            "components/eventEmitter/*.js"
+            "components/eventie/*.js"
+            "components/imagesloaded/*.js"
+            "components/font-awesome/css/font-awesome*.css"
             "components/font-awesome/font/fontawesome-webfont.woff"
           ]
         ]

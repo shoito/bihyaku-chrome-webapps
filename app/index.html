@@ -4,30 +4,33 @@
     <meta charset="utf-8">
     <title>美人百景</title>
     <meta name="description" content="美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。" />
+    <meta name="application-name" content="美人百景" />
+    <meta name="msapplication-TileColor" content="#ff2f92" />
+    <meta name="msapplication-TileImage" content="/images/icon-144.png"/>
+    <meta name="msapplication-square70x70logo" content="/images/icon-70.png" />
+    <meta name="msapplication-square150x150logo" content="/images/icon-150.png" />
+    <meta name="msapplication-wide310x150logo" content="/images/icon-310x150.png" />
+    <meta name="msapplication-square310x310logo" content="/images/icon-310.png" />
     <meta name="google-site-verification" content="89dndC9nTh473XkgXKC6WWh4c-T0NW9DbX2C4XcV5rw" />
-    <meta property="og:title" content="美人百景">
-    <meta property="og:type" content="website">
-    <meta property="og:description" content="美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。">
-    <meta property="og:url" content="http://bihyaku.appspot.com/">
-    <meta property="og:image" content="http://bihyaku.appspot.com/images/icon-256.png">
-    <meta property="og:site_name" content="美人百景">
-    <meta name="application-name" content=" 美人百景" />
-    <meta name="msapplication-TileColor" content=" #ff2f92" />
-    <meta name="msapplication-square70x70logo" content="images/icon-70.png" />
-    <meta name="msapplication-square150x150logo" content="images/icon-150.png" />
-    <meta name="msapplication-wide310x150logo" content="images/icon-310x150.png" />
-    <meta name="msapplication-square310x310logo" content="images/icon-310.png" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link href="components/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="styles/main.css" rel="stylesheet">
+    <meta property="og:title" content="美人百景" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description" content="美しい女性、綺麗な女性、可愛い女性をいつでも堂々と好きなだけ眺められるアプリです。" />
+    <meta property="og:url" content="http://bihyaku.appspot.com/" />
+    <meta property="og:image" content="http://bihyaku.appspot.com/images/icon-256.png" />
+    <meta property="og:site_name" content="美人百景" />
+    <link rel="shortcut icon" href="/favicon.ico"/>
+    <link rel="icon" href="/favicon.ico"/>
+    <link rel="canonical" href="http://bihyaku.appspot.com/"/>
+    <link rel="stylesheet" href="components/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="styles/main.css"/>
 </head>
 <body>
     <header>
-        <h1>今日の美人百景<small class="js-today"></small></h1>
+        <h1><span class="title">今日の美人百景</span><small class="js-today"></small></h1>
     </header>
-    <section id="controls">
-        <a href="#" id="reload"><i class="icon-repeat"></i></a>
+    <section id="app-controls">
+        <a href="#" id="control-collapse" title="操作ボタンの表示/非表示を切り替える"><i class="icon-collapse" style="display: none;"></i></a>
+        <a href="#" id="reload" title="別の景色を見る"><i class="icon-repeat"></i></a>
     </section>
     <section id="loading">
         <img src="images/loading.gif">
@@ -39,9 +42,18 @@
         <span>powerd by <a href="http://bjin.me/" target="_blank">Bjin.Me</a></span>
     </footer>
 
-    <script src="components/jquery/jquery.js"></script>
-    <script src="components/eventEmitter/EventEmitter.js"></script>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-677679-28', 'bihyaku.appspot.com');
+      ga('send', 'pageview');
+    </script>
+    <script src="components/jquery/jquery.min.js"></script>
     <script src="components/eventie/eventie.js"></script>
+    <script src="components/eventEmitter/EventEmitter.min.js"></script>
     <script src="components/imagesloaded/imagesloaded.js"></script>
     <script src="scripts/jquery.wookmark.js"></script>
     <!-- build:js scripts/bijin.js -->
