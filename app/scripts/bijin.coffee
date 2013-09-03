@@ -4,9 +4,9 @@ highQuality = true
 bijin = {}
 controlVisibleClass = "show"
 
-$photos = $("#photos")
-$loading = $("#loading")
-$ctrlCol = $("#control-collapse > i")
+$photos = $(".js-photos")
+$loading = $(".js-loading")
+$ctrlCol = $(".js-control-collapse > i")
 
 relocatePhotos = ->
     options =
@@ -14,12 +14,12 @@ relocatePhotos = ->
         autoResize: true
         itemWidth: itemWidth
         flexibleWidth: true
-        container: $("#photos-container")
+        container: $(".js-photos-container")
     $photos.find("li").wookmark(options).show()
 
 toggleControl = (controlVisible)->
     controlVisibleClass = if controlVisible then "show" else ""
-    $photoCtrl = $("#photos .controls")
+    $photoCtrl = $(".js-controls")
     if controlVisible
         $ctrlCol.removeClass("icon-collapse").addClass "icon-collapse-top"
         $photoCtrl.show()
@@ -33,23 +33,23 @@ renderBijin = (bijinData) ->
         lqThunbnail = bijin.thumb
         thumbnail = if highQuality then hqThumbnail else lqThunbnail
         $photos.append """
-        <li style="display: none;">
+        <li class="photo-container" style="display: none;">
             <a href="#{bijin.link}" target="_blank" class="control bjinme" title="Bjin.Meで詳細を見る">
                 <i class="icon-heart"></i>
             </a>
-            <a href="#" class="photo" title="#{bijin.category}の写真をもっと見る" >
+            <a href="#" class="js-photo" title="#{bijin.category}の写真をもっと見る" >
                 <img data-id="#{bijin.id}" data-category="#{bijin.category}" 
                     data-pub-data="#{bijin.pubDate}" data-hq-thumb="#{hqThumbnail}" 
                     data-lq-thumb="#{lqThunbnail}" src="#{thumbnail}">
             </a>
-            <div class="controls #{controlVisibleClass}">
+            <div class="js-controls controls #{controlVisibleClass}">
                 <a href="https://www.google.co.jp/search?q=#{bijin.category}&safe=off&tbm=isch" target="_blank" class="control" title="Google画像検索で#{bijin.category}を探す">
                     <i class="btn-google"></i>
                 </a>
                 <a href="http://www.youtube.com/results?search_query=#{bijin.category}" target="_blank" class="control" title="YouTubeで#{bijin.category}を探す">
                     <i class="icon-youtube-play"></i>
                 </a>
-                <a href="http://www.nicovideo.jp/search/#{bijin.category}" target="_blank" class="control" title="niconicoで#{bijin.category}を探す">
+                <a href="http://search.nicovideo.jp/search/#{bijin.category}" target="_blank" class="control" title="niconicoで#{bijin.category}を探す">
                     <i class="btn-niconico"></i>
                 </a>
                 <a href="http://ja.wikipedia.org/wiki/#{bijin.category}" target="_blank" class="control" title="Wikipediaで#{bijin.category}を探す">
@@ -95,8 +95,8 @@ loadSpecifiedBijin = (bijinId) ->
         bijinData = JSON.parse xhr.responseText
 
         if bijinData.length > 0
-            $(".title").text "#{bijinData[0].category}の美人百景" if bijinData[0].category isnt ""
-            $("#photos").find("li").remove()
+            $(".js-title").text "#{bijinData[0].category}の美人百景" if bijinData[0].category isnt ""
+            $(".js-photos").find("li").remove()
             renderBijin bijinData
         else
             $loading.hide()
@@ -123,14 +123,14 @@ searchBijin = (category, callback) ->
         callback bijinId if callback?
     xhr.send()
 
-$("#reload").click (e) ->
+$(".reload").click (e) ->
     e.preventDefault()
     localStorage.removeItem "bijin"
-    $(".title").text "今日の美人百景"
-    $("#photos").find("li").remove()
+    $(".js-title").text "今日の美人百景"
+    $(".js-photos").find("li").remove()
     loadBijin count
 
-$(document).on "click", "#photos a.photo", (e) ->
+$(document).on "click", ".js-photo", (e) ->
     e.preventDefault()
     category = $(@).children("img").data("category")
 

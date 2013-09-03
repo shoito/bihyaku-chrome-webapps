@@ -2,6 +2,7 @@
 
 # Generated on 2013-05-11 using generator-chrome-extension 0.1.1
 "use strict"
+LIVERELOAD_PORT = 35729
 mountFolder = (connect, dir) ->
   connect.static require("path").resolve(dir)
 
@@ -24,29 +25,46 @@ module.exports = (grunt) ->
   grunt.initConfig
     yeoman: yeomanConfig
     watch:
+      html:
+        files: ["<%= yeoman.app %>/{,*/}*.html"]
+        tasks: ["build"]
+        options:
+          livereload: LIVERELOAD_PORT
+
       coffee:
         files: ["<%= yeoman.app %>/scripts/{,*/}*.coffee"]
         tasks: ["build"]
+        options:
+          livereload: LIVERELOAD_PORT
 
       coffeeTest:
         files: ["test/spec/{,*/}*.coffee"]
         tasks: ["coffee:test"]
 
       less:
-        files: ["<%= yeoman.app %>/styles/**/*.less"]
+        files: ["<%= yeoman.app %>/styles/{,*/}*.{less,css}"]
         tasks: ["build"]
+        options:
+          livereload: LIVERELOAD_PORT
 
     connect:
       options:
-        port: 9000
-        
-        # change this to '0.0.0.0' to access the server from outside
-        hostname: "localhost"
+        port: 3501
 
+      livereload:
+        options:
+          middleware: (connect, options) ->
+            return [
+              mountFolder connect, "dist"
+            ]
       test:
         options:
           middleware: (connect) ->
             [mountFolder(connect, ".tmp"), mountFolder(connect, "test")]
+
+    open:
+      server:
+        url: "http://localhost:<%= connect.options.port %>"
 
     clean:
       dist:
@@ -111,18 +129,6 @@ module.exports = (grunt) ->
           basePath: "app/styles"
           yuicompress: true
     
-    # not used since Uglify task does concat,
-    # but still available if needed
-    #concat: {
-    #            dist: {}
-    #        },
-    
-    # not enabled since usemin task does concat and uglify
-    # check index.html to edit your build targets
-    # enable this task if you prefer defining your build targets here
-    #uglify: {
-    #            dist: {}
-    #        },
     useminPrepare:
       html: ["<%= yeoman.app %>/index.html"]
       options:
@@ -173,7 +179,7 @@ module.exports = (grunt) ->
         files: [
           expand: true
           cwd: "<%= yeoman.app %>"
-          src: "*.html"
+          src: "index.html"
           dest: "<%= yeoman.dist %>"
         ]
 
@@ -187,7 +193,7 @@ module.exports = (grunt) ->
           cwd: ".tmp"
           dest: "<%= yeoman.dist %>"
           src: [
-            "scripts/{,*/}*.js"
+            "scripts/main.js"
           ]
         ]
       dist:
@@ -200,15 +206,28 @@ module.exports = (grunt) ->
             "*.{ico,txt,yaml}"
             "images/{,*/}*.{webp,gif}"
             "_locales/{,*/}*.json"
-            "scripts/{,*/}*.js"
             "components/jquery/*.js"
-            "components/eventEmitter/*.js"
-            "components/eventie/*.js"
-            "components/imagesloaded/*.js"
             "components/font-awesome/css/font-awesome*.css"
-            "components/font-awesome/font/fontawesome-webfont.woff"
+            "components/font-awesome/font/fontawesome-webfont.*"
           ]
         ]
+
+    concat:
+      dist:
+        src: [
+          "<%= yeoman.app %>/components/eventie/eventie.js"
+          "<%= yeoman.app %>/components/eventEmitter/EventEmitter.min.js"
+          "<%= yeoman.app %>/components/imagesloaded/imagesloaded.js"
+          "<%= yeoman.app %>/scripts/jquery.wookmark.js"
+          ".tmp/scripts/bijin.js"
+        ]
+        dest: ".tmp/scripts/main.js"
+        separator: ";"
+
+    uglify:
+      dist:
+        files:
+          "<%= yeoman.dist %>/scripts/main.min.js": [".tmp/scripts/main.js"]
 
     concurrent:
       server: ["coffee:dist", "less"]
@@ -228,21 +247,13 @@ module.exports = (grunt) ->
         ]
 
   grunt.renameTask "regarde", "watch"
-  grunt.registerTask "prepareManifest", ->
-    scripts = []
-    concat = grunt.config("concat") or dist:
-      files: {}
-
-    uglify = grunt.config("uglify") or dist:
-      files: {}
-
-    grunt.config "concat", concat
-    grunt.config "uglify", uglify
-
-  grunt.registerTask "manifest", ->
-    manifest = grunt.file.readJSON(yeomanConfig.app + "/manifest.json")
-    grunt.file.write yeomanConfig.dist + "/manifest.json", JSON.stringify(manifest, null, 2)
-
+  grunt.registerTask "server", (target) ->
+    grunt.task.run [
+      "build"
+      "connect:livereload"
+      "open:server"
+      "watch"
+    ]
   grunt.registerTask "test", ["clean:server", "concurrent:test", "connect:test", "mocha"]
-  grunt.registerTask "build", ["clean:dist", "prepareManifest", "useminPrepare", "concurrent:dist", "concat", "uglify", "copy:coffee", "copy:dist", "usemin", "manifest", "compress"]
+  grunt.registerTask "build", ["clean:dist", "useminPrepare", "concurrent:dist", "concat", "uglify", "copy:coffee", "copy:dist", "usemin", "compress"]
   grunt.registerTask "default", ["jshint", "test", "build"]
