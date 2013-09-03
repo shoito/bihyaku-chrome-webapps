@@ -26,17 +26,17 @@
 </head>
 <body>
     <header>
-        <h1><span class="title">今日の美人百景</span><small class="js-today"></small></h1>
+        <h1><span class="js-title title">今日の美人百景</span><small class="js-today"></small></h1>
     </header>
-    <section id="app-controls">
-        <a href="#" id="control-collapse" title="操作ボタンの表示/非表示を切り替える"><i class="icon-collapse" style="display: none;"></i></a>
-        <a href="#" id="reload" title="別の景色を見る"><i class="icon-repeat"></i></a>
+    <section class="app-controls">
+        <a href="#" class="js-control-collapse" title="操作ボタンの表示/非表示を切り替える"><i class="icon-collapse" style="display: none;"></i></a>
+        <a href="#" class="reload" title="別の景色を見る"><i class="icon-repeat"></i></a>
     </section>
-    <section id="loading">
+    <section class="js-loading loading">
         <img src="images/loading.gif">
     </section>
-    <section id="photos-container">
-        <ul id="photos"></ul>
+    <section class="js-photos-container photos-container">
+        <ul class="js-photos"></ul>
     </section>
     <footer>
         <span>powerd by <a href="http://bjin.me/" target="_blank">Bjin.Me</a></span>
@@ -51,13 +51,10 @@
       ga('create', 'UA-677679-28', 'bihyaku.appspot.com');
       ga('send', 'pageview');
     </script>
-    <script src="components/jquery/jquery.min.js"></script>
-    <script src="components/eventie/eventie.js"></script>
-    <script src="components/eventEmitter/EventEmitter.min.js"></script>
-    <script src="components/imagesloaded/imagesloaded.js"></script>
-    <script src="scripts/jquery.wookmark.js"></script>
-    <!-- build:js scripts/bijin.js -->
-    <script src="scripts/bijin.js"></script>
+    <script src="//code.jquery.com/jquery-1.8.3.min.js"></script>
+    <script>window.jQuery || document.write('<script src="components/jquery/jquery.min.js"><\/script>')</script>
+    <!-- build:js scripts/main.min.js -->
+    <script src="scripts/main.js"></script>
     <!-- endbuild -->
 </body>
 </html>

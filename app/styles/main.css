@@ -63,84 +63,90 @@ header h1 small {
     font-weight: normal;
 }
 
-#app-controls {
+.app-controls {
     position: fixed;
     top: 26px;
     right: 16px;
 }
 
-#app-controls a {
+.app-controls a {
     padding-left: 8px;
     color: #333;
     text-decoration: none;
 }
 
-#app-controls a:hover {
+.app-controls a:hover {
     opacity: 0.8;
 }
 
-#app-controls i {
+.app-controls i {
     font-size: 2em;
 }
 
-#photos-container {
+.photos-container {
     position: relative;
     margin-top: 12px;
     /*opacity: 0.1;*/
 }
 
-#photos li {
+.photo-container {
     background-color: #ffffff;
     -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
     border-radius: 4px;
     padding: 5px;
     border: 1px solid #dedede;
+    -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
 
-#photos li img {
+.photo-container img {
     display: block;
     -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -ms-border-radius: 2px;
     border-radius: 2px;
     width: 100%;
     height: auto;
 }
 
-#photos li:hover img {
+.photo-container:hover img {
     opacity: 0.8;
 }
 
-#photos li a.control {
+.control {
     /*color: #ff2f92;*/
     color: #333;
     text-decoration: none;
     font-size: 18px;
 }
 
-#photos li a.control:hover {
+.control:hover {
     opacity: 0.8;
 }
 
-#photos li a.control.bjinme {
+.control.bjinme {
     color: #ff2f92;
     position: absolute;
     z-index: 2;
 }
 
-#photos li a.control.bjinme:hover {
+.control.bjinme:hover {
     opacity: 1;
     font-size: 21px;
 }
 
-#photos .controls {
+.controls {
+    padding-top: 4px;
     display: none;
 }
 
-#photos .controls.show {
+.controls.show {
     display: block;
 }
 
-#loading {
+.loading {
     display: none;
     height: 80px;
     width: 80px;
