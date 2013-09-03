@@ -34,7 +34,7 @@ renderBijin = (bijinData) ->
         thumbnail = if highQuality then hqThumbnail else lqThunbnail
         $photos.append """
         <li class="photo-container" style="display: none;">
-            <a href="#{bijin.link}" target="_blank" class="control bjinme" title="Bjin.Meで詳細を見る">
+            <a href="#{bijin.link}" target="_blank" data-id="#{bijin.id}" data-category="#{bijin.category}" class="control bjinme js-bjinme" title="Bjin.Meで詳細を見る">
                 <i class="icon-heart"></i>
             </a>
             <a href="#" class="js-photo" title="#{bijin.category}の写真をもっと見る" >
@@ -43,16 +43,16 @@ renderBijin = (bijinData) ->
                     data-lq-thumb="#{lqThunbnail}" src="#{thumbnail}">
             </a>
             <div class="js-controls controls #{controlVisibleClass}">
-                <a href="https://www.google.co.jp/search?q=#{bijin.category}&safe=off&tbm=isch" target="_blank" class="control" title="Google画像検索で#{bijin.category}を探す">
+                <a href="https://www.google.co.jp/search?q=#{bijin.category}&safe=off&tbm=isch" target="_blank" data-id="#{bijin.id}" data-service="google" class="control" title="Google画像検索で#{bijin.category}を探す">
                     <i class="btn-google"></i>
                 </a>
-                <a href="http://www.youtube.com/results?search_query=#{bijin.category}" target="_blank" class="control" title="YouTubeで#{bijin.category}を探す">
+                <a href="http://www.youtube.com/results?search_query=#{bijin.category}" target="_blank" data-id="#{bijin.id}" data-service="youtube" class="control" title="YouTubeで#{bijin.category}を探す">
                     <i class="icon-youtube-play"></i>
                 </a>
-                <a href="http://search.nicovideo.jp/search/#{bijin.category}" target="_blank" class="control" title="niconicoで#{bijin.category}を探す">
+                <a href="http://search.nicovideo.jp/search/#{bijin.category}" target="_blank" data-id="#{bijin.id}" data-service="niconico" class="control" title="niconicoで#{bijin.category}を探す">
                     <i class="btn-niconico"></i>
                 </a>
-                <a href="http://ja.wikipedia.org/wiki/#{bijin.category}" target="_blank" class="control" title="Wikipediaで#{bijin.category}を探す">
+                <a href="http://ja.wikipedia.org/wiki/#{bijin.category}" target="_blank" data-id="#{bijin.id}" data-service="wikipedia" class="control" title="Wikipediaで#{bijin.category}を探す">
                     <i class="btn-wikipedia"></i>
                 </a>
             </div>
@@ -125,14 +125,28 @@ searchBijin = (category, callback) ->
 
 $(".reload").click (e) ->
     e.preventDefault()
+    gase? "reload", "click", "reload"
     localStorage.removeItem "bijin"
     $(".js-title").text "今日の美人百景"
     $(".js-photos").find("li").remove()
     loadBijin count
 
+$(document).on "click", ".js-bjinme", (e) ->
+    id = $(@).data "id"
+    category = $(@).data "category"
+    gase? "bjinme", "click", category, parseInt(id, 10)
+
+$(document).on "click", ".js-controls a", (e) ->
+    id = $(@).data "id"
+    service = $(@).data "service"
+    gase? "controls", "click", service, parseInt(id, 10)
+
 $(document).on "click", ".js-photo", (e) ->
     e.preventDefault()
-    category = $(@).children("img").data("category")
+    $img = $(@).children "img"
+    id = $img.data "id"
+    category = $img.data "category"
+    gase? "photo", "click", category, parseInt(id, 10)
 
     if category is ""
         $(@).hide()
@@ -149,9 +163,10 @@ $(".js-today").text today()
 
 toggleControl(localStorage["controlVisible"] is "true")
 $ctrlCol.show()
-$ctrlCol.click ->
+$ctrlCol.click (e) ->
     localStorage["controlVisible"] = controlVisible = !(localStorage["controlVisible"] is "true")
     toggleControl controlVisible
+    gase? "controlVisible", "click", controlVisible
     relocatePhotos()
 
 if count is 0
