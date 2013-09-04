@@ -1,5 +1,5 @@
 count = 0
-itemWidth = 200
+itemWidth = if screen.width > 480 then 220 else 150
 highQuality = true
 bijin = {}
 controlVisibleClass = "show"
@@ -153,6 +153,7 @@ $(document).on "click", ".js-photo", (e) ->
         return
 
     searchBijin category, loadSpecifiedBijin
+    setTimeout (-> window.scroll 0, 0), 0
 
 count = parseInt(localStorage.getItem("count") || count)
 itemWidth = parseInt(localStorage.getItem("itemWidth") || itemWidth)
@@ -164,6 +165,7 @@ $(".js-today").text today()
 toggleControl(localStorage["controlVisible"] is "true")
 $ctrlCol.show()
 $ctrlCol.click (e) ->
+    e.preventDefault()
     localStorage["controlVisible"] = controlVisible = !(localStorage["controlVisible"] is "true")
     toggleControl controlVisible
     gase? "controlVisible", "click", controlVisible
