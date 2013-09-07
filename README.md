@@ -15,3 +15,8 @@
 #### スクリーンショット
 
 ![美人百景](https://raw.github.com/shoito/bihyaku-chrome-webapps/master/elements/ss00.jpg)
+
+
+## Todo
+* 下部にスクロールした際に、さらに写真を表示する
+* 下部にオーバーレイで女性の動画コンテンツを並べ、タップすると画面中央で再生する
