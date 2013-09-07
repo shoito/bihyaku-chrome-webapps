@@ -1,8 +1,10 @@
-count = 0
-itemWidth = if screen.width > 480 then 220 else 150
-highQuality = true
-bijin = {}
-controlVisibleClass = "show"
+app = app || {}
+window.app = app
+app.count = 0
+app.itemWidth = if screen.width > 480 then 220 else 150
+app.highQuality = true
+app.bijin = {}
+app.controlVisibleClass = "show"
 
 $photos = $(".js-photos")
 $loading = $(".js-loading")
@@ -12,13 +14,13 @@ relocatePhotos = ->
     options =
         offset: 1
         autoResize: true
-        itemWidth: itemWidth
+        itemWidth: app.itemWidth
         flexibleWidth: true
         container: $(".js-photos-container")
     $photos.find("li").wookmark(options).show()
 
-toggleControl = (controlVisible)->
-    controlVisibleClass = if controlVisible then "show" else ""
+toggleControl = (controlVisible) ->
+    app.controlVisibleClass = if controlVisible then "show" else ""
     $photoCtrl = $(".js-controls")
     if controlVisible
         $ctrlCol.removeClass("icon-collapse").addClass "icon-collapse-top"
@@ -31,7 +33,7 @@ renderBijin = (bijinData) ->
     for bijin in bijinData
         hqThumbnail = "http://bjin.me/images/pic#{bijin.id}.jpg"
         lqThunbnail = bijin.thumb
-        thumbnail = if highQuality then hqThumbnail else lqThunbnail
+        thumbnail = if app.highQuality then hqThumbnail else lqThunbnail
         $photos.append """
         <li class="photo-container" style="display: none;">
             <a href="#{bijin.link}" target="_blank" data-id="#{bijin.id}" data-category="#{bijin.category}" class="control bjinme js-bjinme" title="Bjin.Meで詳細を見る">
@@ -42,7 +44,7 @@ renderBijin = (bijinData) ->
                     data-pub-data="#{bijin.pubDate}" data-hq-thumb="#{hqThumbnail}" 
                     data-lq-thumb="#{lqThunbnail}" src="#{thumbnail}">
             </a>
-            <div class="js-controls controls #{controlVisibleClass}">
+            <div class="js-controls controls #{app.controlVisibleClass}">
                 <a href="https://www.google.co.jp/search?q=#{bijin.category}&safe=off&tbm=isch" target="_blank" data-id="#{bijin.id}" data-service="google" class="control" title="Google画像検索で#{bijin.category}を探す">
                     <i class="btn-google"></i>
                 </a>
@@ -73,36 +75,62 @@ today = ->
     day = "0" + day if day < 10
     "#{year}/#{month}/#{day}"
 
-loadBijin = (count) ->
-    $loading.fadeIn("fast")
-    if bijin.timestamp is today()
-        renderBijin bijin.data
+handleError = (e) ->
+    console?.err? e
+
+loadUnspecifiedBijin = (doAppend = false) ->
+    $(".js-title").text document.title = "今日の美人百景"
+    $(".js-photos").find("li").remove() if !doAppend
+    $loading.fadeIn("fast") if $loading.is ":hidden"
+
+    if app.bijin.timestamp is today()
+        renderBijin app.bijin.data
     else
         xhr = new XMLHttpRequest()
-        xhr.open "GET", "http://bjin.me/api/?format=json&count=#{count}&type=rand", true
+        xhr.open "GET", "http://bjin.me/api/?format=json&count=#{app.count}&type=rand", true
         xhr.onreadystatechange = ->
             return unless xhr.readyState is 4
-            bijinData = JSON.parse xhr.responseText
-            renderBijin bijinData
-            localStorage.setItem "bijin", JSON.stringify({data: bijinData, timestamp: today()})
+            bijinData
+            try
+                bijinData = JSON.parse xhr.responseText
+                history.pushState {}, "", "/" if window.history?.pushState? and location.pathname isnt "/"
+                renderBijin bijinData
+                localStorage.setItem "bijin", JSON.stringify({data: bijinData, timestamp: today()})
+            catch e
+                handleError e
         xhr.send()
 
-loadSpecifiedBijin = (bijinId) ->
+loadSpecifiedBijin = (bijinId, doAppend = false) ->
+    $(".js-photos").find("li").remove() if !doAppend
+    $loading.fadeIn("fast") if $loading.is ":hidden"
+
     xhr = new XMLHttpRequest()
-    xhr.open "GET", "http://bjin.me/api/?type=detail&count=#{count}&format=json&id=#{bijinId}", true
+    xhr.open "GET", "http://bjin.me/api/?type=detail&count=#{app.count}&format=json&id=#{bijinId}", true
     xhr.onreadystatechange = ->
         return unless xhr.readyState is 4
-        bijinData = JSON.parse xhr.responseText
+        bijinData
+        try
+            bijinData = JSON.parse xhr.responseText
+        catch e
+            handleError e
 
-        if bijinData.length > 0
-            $(".js-title").text "#{bijinData[0].category}の美人百景" if bijinData[0].category isnt ""
-            $(".js-photos").find("li").remove()
+        if bijinData?.length > 0
+            bijin = bijinData[0]
+            $(".js-title").text document.title = "#{bijin.category}の美人百景" if bijin.category isnt ""
+            history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
         else
             $loading.hide()
     xhr.send()
 
-searchBijin = (category, callback) ->
+loadBijin = ->
+    bijinId = parseBijinIdInPath()
+    if bijinId?
+        loadSpecifiedBijin bijinId
+    else
+        loadUnspecifiedBijin()
+
+searchBijin = (category, callback) =>
     $loading.fadeIn "fast"
 
     if (bijinId = localStorage["category-" + encodeURIComponent(category)])?
@@ -113,7 +141,11 @@ searchBijin = (category, callback) ->
     xhr.open "GET", "http://bjin.me/api/?type=search&count=1&format=json&query=#{category}", true
     xhr.onreadystatechange = ->
         return unless xhr.readyState is 4
-        bijinId = JSON.parse(xhr.responseText)[0]?.id
+        bijinId
+        try
+            bijinId = JSON.parse(xhr.responseText)[0]?.id
+        catch e
+            handleError e
 
         if !bijinId?
             $loading.hide()
@@ -123,13 +155,38 @@ searchBijin = (category, callback) ->
         callback bijinId if callback?
     xhr.send()
 
+parseBijinIdInPath = ->
+    paths = location.pathname.split "/"
+    paths.length is 3 and paths[1] is "bijin" and /\d+/.test paths[2]
+    paths[2] || undefined
+
+app.count = parseInt(localStorage.getItem("count") || app.count)
+app.itemWidth = parseInt(localStorage.getItem("itemWidth") || app.itemWidth)
+if app.count is 0
+    widthNum = $(window).width() / app.itemWidth
+    heightNum = ($(window).height() - 72) / app.itemWidth
+    app.count = ~~(widthNum * heightNum)
+    app.count = 18 if app.count < 18
+
+app.highQuality = !!(localStorage.getItem("high-quality") || app.highQuality)
+app.bijin = JSON.parse(localStorage.getItem("bijin") || "{}")
+
+$(".js-today").text today()
+
+toggleControl(localStorage["controlVisible"] is "true")
+$ctrlCol.show()
+$ctrlCol.click (e) ->
+    e.preventDefault()
+    localStorage["controlVisible"] = controlVisible = !(localStorage["controlVisible"] is "true")
+    toggleControl controlVisible
+    gase? "controlVisible", "click", controlVisible
+    relocatePhotos()
+
 $(".reload").click (e) ->
     e.preventDefault()
     gase? "reload", "click", "reload"
     localStorage.removeItem "bijin"
-    $(".js-title").text "今日の美人百景"
-    $(".js-photos").find("li").remove()
-    loadBijin count
+    loadBijin()
 
 $(document).on "click", ".js-bjinme", (e) ->
     id = $(@).data "id"
@@ -153,28 +210,13 @@ $(document).on "click", ".js-photo", (e) ->
         return
 
     searchBijin category, loadSpecifiedBijin
-    setTimeout (-> window.scroll 0, 0), 0
+    # setTimeout (-> window.scroll 0, 0), 0
 
-count = parseInt(localStorage.getItem("count") || count)
-itemWidth = parseInt(localStorage.getItem("itemWidth") || itemWidth)
-highQuality = !!(localStorage.getItem("high-quality") || highQuality)
-bijin = JSON.parse(localStorage.getItem("bijin") || "{}")
+popped = window.history.state?
+initialUrl = location.href
+$(window).on "popstate", (e) =>
+    initialPop = !popped and location.href is initialUrl
+    popped = true
+    loadBijin() if !initialPop
 
-$(".js-today").text today()
-
-toggleControl(localStorage["controlVisible"] is "true")
-$ctrlCol.show()
-$ctrlCol.click (e) ->
-    e.preventDefault()
-    localStorage["controlVisible"] = controlVisible = !(localStorage["controlVisible"] is "true")
-    toggleControl controlVisible
-    gase? "controlVisible", "click", controlVisible
-    relocatePhotos()
-
-if count is 0
-    widthNum = $(window).width() / itemWidth
-    heightNum = ($(window).height() - 72) / itemWidth
-    count = widthNum * heightNum
-    count = 15 if count < 15
-
-loadBijin count
+loadBijin()
