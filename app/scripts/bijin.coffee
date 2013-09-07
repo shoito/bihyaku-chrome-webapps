@@ -6,9 +6,12 @@ app.highQuality = true
 app.bijin = {}
 app.controlVisibleClass = "show"
 
+MIN_COUNT = 18
+$title = $(".js-title")
 $photos = $(".js-photos")
 $loading = $(".js-loading")
 $ctrlCol = $(".js-control-collapse > i")
+$loadMoreBtn = $(".js-loadmore")
 
 relocatePhotos = ->
     options =
@@ -64,6 +67,7 @@ renderBijin = (bijinData) ->
     $photos.imagesLoaded ->
         $loading.hide()
         relocatePhotos()
+        $loadMoreBtn.text("もっと見たい").removeClass("pure-button-disabled").show()
     @
 
 today = ->
@@ -78,16 +82,21 @@ today = ->
 handleError = (e) ->
     console?.err? e
 
-loadUnspecifiedBijin = (doAppend = false) ->
-    $(".js-title").text document.title = "今日の美人百景"
-    $(".js-photos").find("li").remove() if !doAppend
+loadUnspecifiedBijin = (count = app.count, doAppend = false) ->
+    if !doAppend
+        $loadMoreBtn.hide()
+        $photos.find("li").remove()
+        relocatePhotos()
+    else
+        $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
+    $title.text document.title = "今日の美人百景"
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
-    if app.bijin.timestamp is today()
+    if !doAppend and app.bijin.timestamp is today()
         renderBijin app.bijin.data
     else
         xhr = new XMLHttpRequest()
-        xhr.open "GET", "http://bjin.me/api/?format=json&count=#{app.count}&type=rand", true
+        xhr.open "GET", "http://bjin.me/api/?format=json&count=#{count}&type=rand", true
         xhr.onreadystatechange = ->
             return unless xhr.readyState is 4
             bijinData
@@ -95,17 +104,22 @@ loadUnspecifiedBijin = (doAppend = false) ->
                 bijinData = JSON.parse xhr.responseText
                 history.pushState {}, "", "/" if window.history?.pushState? and location.pathname isnt "/"
                 renderBijin bijinData
-                localStorage.setItem "bijin", JSON.stringify({data: bijinData, timestamp: today()})
+                localStorage.setItem "bijin", JSON.stringify({data: bijinData, timestamp: today()}) if !doAppend
             catch e
                 handleError e
         xhr.send()
 
-loadSpecifiedBijin = (bijinId, doAppend = false) ->
-    $(".js-photos").find("li").remove() if !doAppend
+loadSpecifiedBijin = (bijinId, count = app.count, doAppend = false) ->
+    if !doAppend
+        $loadMoreBtn.hide()
+        $photos.find("li").remove()
+        relocatePhotos()
+    else
+        $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
     xhr = new XMLHttpRequest()
-    xhr.open "GET", "http://bjin.me/api/?type=detail&count=#{app.count}&format=json&id=#{bijinId}", true
+    xhr.open "GET", "http://bjin.me/api/?type=detail&count=#{count}&format=json&id=#{bijinId}", true
     xhr.onreadystatechange = ->
         return unless xhr.readyState is 4
         bijinData
@@ -116,19 +130,19 @@ loadSpecifiedBijin = (bijinId, doAppend = false) ->
 
         if bijinData?.length > 0
             bijin = bijinData[0]
-            $(".js-title").text document.title = "#{bijin.category}の美人百景" if bijin.category isnt ""
+            $title.text document.title = "#{bijin.category}の美人百景" if bijin.category isnt ""
             history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
         else
             $loading.hide()
     xhr.send()
 
-loadBijin = ->
+loadBijin = (count = app.count, doAppend = false) ->
     bijinId = parseBijinIdInPath()
     if bijinId?
-        loadSpecifiedBijin bijinId
+        loadSpecifiedBijin bijinId, count, doAppend
     else
-        loadUnspecifiedBijin()
+        loadUnspecifiedBijin count, doAppend
 
 searchBijin = (category, callback) =>
     $loading.fadeIn "fast"
@@ -166,7 +180,7 @@ if app.count is 0
     widthNum = $(window).width() / app.itemWidth
     heightNum = ($(window).height() - 72) / app.itemWidth
     app.count = ~~(widthNum * heightNum)
-    app.count = 18 if app.count < 18
+    app.count = MIN_COUNT if app.count < MIN_COUNT
 
 app.highQuality = !!(localStorage.getItem("high-quality") || app.highQuality)
 app.bijin = JSON.parse(localStorage.getItem("bijin") || "{}")
@@ -186,7 +200,7 @@ $(".reload").click (e) ->
     e.preventDefault()
     gase? "reload", "click", "reload"
     localStorage.removeItem "bijin"
-    loadBijin()
+    loadBijin app.count
 
 $(document).on "click", ".js-bjinme", (e) ->
     id = $(@).data "id"
@@ -211,6 +225,11 @@ $(document).on "click", ".js-photo", (e) ->
 
     searchBijin category, loadSpecifiedBijin
     # setTimeout (-> window.scroll 0, 0), 0
+
+$(document).on "click", ".js-loadmore", (e) ->
+    e.preventDefault()
+    loadBijin app.count, true
+    gase? "loadmore", "click", location.pathname
 
 popped = window.history.state?
 initialUrl = location.href
