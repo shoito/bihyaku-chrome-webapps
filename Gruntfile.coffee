@@ -128,7 +128,15 @@ module.exports = (grunt) ->
         options:
           basePath: "app/styles"
           yuicompress: true
-    
+
+    rev:
+      dist:
+        files:
+          src: [
+            "dist/scripts/{,*/}*.js"
+            "dist/styles/{,*/}*.css"
+          ]
+
     useminPrepare:
       html: ["<%= yeoman.app %>/index.html"]
       options:
@@ -255,5 +263,5 @@ module.exports = (grunt) ->
       "watch"
     ]
   grunt.registerTask "test", ["clean:server", "concurrent:test", "connect:test", "mocha"]
-  grunt.registerTask "build", ["clean:dist", "useminPrepare", "concurrent:dist", "concat", "uglify", "copy:coffee", "copy:dist", "usemin", "compress"]
+  grunt.registerTask "build", ["clean:dist", "useminPrepare", "concurrent:dist", "concat", "uglify", "copy:coffee", "copy:dist", "rev", "usemin", "compress"]
   grunt.registerTask "default", ["jshint", "test", "build"]

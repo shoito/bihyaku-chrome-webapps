@@ -8,6 +8,7 @@ app.controlVisibleClass = "show"
 
 MIN_COUNT = 18
 $title = $(".js-title")
+$photosContainer = $(".js-photos-container")
 $photos = $(".js-photos")
 $loading = $(".js-loading")
 $ctrlCol = $(".js-control-collapse > i")
@@ -19,7 +20,7 @@ relocatePhotos = ->
         autoResize: true
         itemWidth: app.itemWidth
         flexibleWidth: true
-        container: $(".js-photos-container")
+        container: $photosContainer
     $photos.find("li").wookmark(options).show()
 
 toggleControl = (controlVisible) ->
@@ -86,13 +87,13 @@ loadUnspecifiedBijin = (count = app.count, doAppend = false) ->
     if !doAppend
         $loadMoreBtn.hide()
         $photos.find("li").remove()
-        relocatePhotos()
+        $photosContainer.height "auto"
     else
         $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
     $title.text document.title = "今日の美人百景"
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
-    if !doAppend and app.bijin.timestamp is today()
+    if !doAppend and app.bijin?.timestamp is today()
         renderBijin app.bijin.data
     else
         xhr = new XMLHttpRequest()
@@ -104,7 +105,8 @@ loadUnspecifiedBijin = (count = app.count, doAppend = false) ->
                 bijinData = JSON.parse xhr.responseText
                 history.pushState {}, "", "/" if window.history?.pushState? and location.pathname isnt "/"
                 renderBijin bijinData
-                localStorage.setItem "bijin", JSON.stringify({data: bijinData, timestamp: today()}) if !doAppend
+                app.bijin = JSON.stringify({data: bijinData, timestamp: today()})
+                localStorage.setItem "bijin", app.bijin if !doAppend
             catch e
                 handleError e
         xhr.send()
@@ -113,7 +115,7 @@ loadSpecifiedBijin = (bijinId, count = app.count, doAppend = false) ->
     if !doAppend
         $loadMoreBtn.hide()
         $photos.find("li").remove()
-        relocatePhotos()
+        $photosContainer.height "auto"
     else
         $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
     $loading.fadeIn("fast") if $loading.is ":hidden"
@@ -200,7 +202,8 @@ $(".reload").click (e) ->
     e.preventDefault()
     gase? "reload", "click", "reload"
     localStorage.removeItem "bijin"
-    loadBijin app.count
+    app.bijin = {}
+    loadBijin app.count, false
 
 $(document).on "click", ".js-bjinme", (e) ->
     id = $(@).data "id"
@@ -236,6 +239,6 @@ initialUrl = location.href
 $(window).on "popstate", (e) =>
     initialPop = !popped and location.href is initialUrl
     popped = true
-    loadBijin() if !initialPop
+    loadBijin app.count, false if !initialPop
 
 loadBijin()
