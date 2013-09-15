@@ -1,5 +1,5 @@
 application: bihyaku
-version: 1
+version: 4
 runtime: python27
 api_version: 1
 threadsafe: yes
@@ -9,7 +9,7 @@ handlers:
   static_files: index.html
   upload: index.html
 
-- url: /bijin/(.*)
+- url: /bijin/(.+)
   static_files: index.html
   upload: index.html
 
