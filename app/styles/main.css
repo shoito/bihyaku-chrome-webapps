@@ -196,26 +196,38 @@ footer a {
     text-align: center;
 }
 
-@media screen and (max-width: 480px){
+.search-field-container {
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.search-field {
+    line-height: 1.6;
+    width: 128px;
+}
+
+@media screen and (max-width: 480px) {
     .head-line {
         text-align: left;
-        margin: 0 42px 0 12px;
+        margin: 0 10px
     }
     .title {
-        display:block;
+        display: block;
         font-size: 0.72em;
     }
     .today {
-        display:block;
-        margin-left: 4px;
-        font-size: 0.5em;
+        display: none;
     }
     .app-controls {
-        top: 8px;
-        right: 8px;
+        position: relative;
+        z-index: 1;
+        top: 6px;
+        left: 10px;
+        text-align: left;
+        margin: 0;
     }
-    .app-controls a {
-        display: block;
+    .search-field {
+        font-size: 16px !important;
     }
 }
 

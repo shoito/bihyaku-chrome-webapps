@@ -35,6 +35,7 @@ module.exports = (grunt) ->
         files: ["<%= yeoman.app %>/scripts/{,*/}*.coffee"]
         tasks: ["build"]
         options:
+          nospawn: true
           livereload: LIVERELOAD_PORT
 
       coffeeTest:
@@ -105,21 +106,6 @@ module.exports = (grunt) ->
           dest: ".tmp/spec"
           ext: ".js"
         ]
-
-    compass:
-      options:
-        sassDir: "<%= yeoman.app %>/styles"
-        cssDir: ".tmp/styles"
-        imagesDir: "<%= yeoman.app %>/images"
-        javascriptsDir: "<%= yeoman.app %>/scripts"
-        fontsDir: "<%= yeoman.app %>/styles/fonts"
-        importPath: "app/components"
-        relativeAssets: true
-
-      dist: {}
-      server:
-        options:
-          debugInfo: true
 
     less:
       production:
@@ -212,11 +198,12 @@ module.exports = (grunt) ->
           dest: "<%= yeoman.dist %>"
           src: [
             "*.{ico,txt,yaml}"
-            "images/{,*/}*.{webp,gif}"
+            "{,styles/}images/{,*/}*.{webp,gif,jpg,jpeg,png}"
             "_locales/{,*/}*.json"
             "components/jquery/*.js"
             "components/font-awesome/css/font-awesome*.css"
             "components/font-awesome/font/fontawesome-webfont.*"
+            "data/*.json"
           ]
         ]
 
@@ -226,6 +213,7 @@ module.exports = (grunt) ->
           "<%= yeoman.app %>/components/eventie/eventie.js"
           "<%= yeoman.app %>/components/eventEmitter/EventEmitter.min.js"
           "<%= yeoman.app %>/components/imagesloaded/imagesloaded.js"
+          "<%= yeoman.app %>/scripts/jquery-ui-1.10.3.custom.min.js"
           "<%= yeoman.app %>/scripts/jquery.wookmark.js"
           ".tmp/scripts/bijin.js"
         ]

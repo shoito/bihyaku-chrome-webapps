@@ -1,10 +1,10 @@
-app = app || {}
-window.app = app
-app.count = 0
-app.itemWidth = if screen.width > 480 then 220 else 150
-app.highQuality = true
-app.bijin = {}
-app.controlVisibleClass = "show"
+bihyaku = bihyaku || {}
+window.bihyaku = bihyaku
+bihyaku.count = 0
+bihyaku.itemWidth = if screen.width > 480 then 220 else 150
+bihyaku.highQuality = true
+bihyaku.bijin = {}
+bihyaku.controlVisibleClass = "show"
 
 MIN_COUNT = 18
 $title = $(".js-title")
@@ -18,13 +18,13 @@ relocatePhotos = ->
     options =
         offset: 1
         autoResize: true
-        itemWidth: app.itemWidth
+        itemWidth: bihyaku.itemWidth
         flexibleWidth: true
         container: $photosContainer
     $photos.find("li").wookmark(options).show()
 
 toggleControl = (controlVisible) ->
-    app.controlVisibleClass = if controlVisible then "show" else ""
+    bihyaku.controlVisibleClass = if controlVisible then "show" else ""
     $photoCtrl = $(".js-controls")
     if controlVisible
         $ctrlCol.removeClass("icon-collapse").addClass "icon-collapse-top"
@@ -37,7 +37,7 @@ renderBijin = (bijinData) ->
     for bijin in bijinData
         hqThumbnail = "http://bjin.me/images/pic#{bijin.id}.jpg"
         lqThunbnail = bijin.thumb
-        thumbnail = if app.highQuality then hqThumbnail else lqThunbnail
+        thumbnail = if bihyaku.highQuality then hqThumbnail else lqThunbnail
         $photos.append """
         <li class="photo-container" style="display: none;">
             <a href="#{bijin.link}" target="_blank" data-id="#{bijin.id}" data-category="#{bijin.category}" class="control bjinme js-bjinme" title="Bjin.Meで詳細を見る">
@@ -48,7 +48,7 @@ renderBijin = (bijinData) ->
                     data-pub-data="#{bijin.pubDate}" data-hq-thumb="#{hqThumbnail}" 
                     data-lq-thumb="#{lqThunbnail}" src="#{thumbnail}">
             </a>
-            <div class="js-controls controls #{app.controlVisibleClass}">
+            <div class="js-controls controls #{bihyaku.controlVisibleClass}">
                 <a href="https://www.google.co.jp/search?q=#{bijin.category}&safe=off&tbm=isch" target="_blank" data-id="#{bijin.id}" data-service="google" class="control" title="Google画像検索で#{bijin.category}を探す">
                     <i class="btn-google"></i>
                 </a>
@@ -83,18 +83,20 @@ today = ->
 handleError = (e) ->
     console?.err? e
 
-loadUnspecifiedBijin = (count = app.count, doAppend = false) ->
+loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
     if !doAppend
         $loadMoreBtn.hide()
         $photos.find("li").remove()
         $photosContainer.height "auto"
     else
         $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
-    $title.text document.title = "今日の美人百景"
+
+    document.title = "美人百景"
+    $title.text "今日の美人百景"
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
-    if !doAppend and app.bijin?.timestamp is today()
-        renderBijin app.bijin.data
+    if !doAppend and bihyaku.bijin?.timestamp is today()
+        renderBijin bihyaku.bijin.data
     else
         xhr = new XMLHttpRequest()
         xhr.open "GET", "http://bjin.me/api/?format=json&count=#{count}&type=rand", true
@@ -105,13 +107,13 @@ loadUnspecifiedBijin = (count = app.count, doAppend = false) ->
                 bijinData = JSON.parse xhr.responseText
                 history.pushState {}, "", "/" if window.history?.pushState? and location.pathname isnt "/"
                 renderBijin bijinData
-                app.bijin = JSON.stringify({data: bijinData, timestamp: today()})
-                localStorage.setItem "bijin", app.bijin if !doAppend
+                bihyaku.bijin = JSON.stringify({data: bijinData, timestamp: today()})
+                localStorage.setItem "bijin", bihyaku.bijin if !doAppend
             catch e
                 handleError e
         xhr.send()
 
-loadSpecifiedBijin = (bijinId, count = app.count, doAppend = false) ->
+loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
     if !doAppend
         $loadMoreBtn.hide()
         $photos.find("li").remove()
@@ -139,7 +141,7 @@ loadSpecifiedBijin = (bijinId, count = app.count, doAppend = false) ->
             $loading.hide()
     xhr.send()
 
-loadBijin = (count = app.count, doAppend = false) ->
+loadBijin = (count = bihyaku.count, doAppend = false) ->
     bijinId = parseBijinIdInPath()
     if bijinId?
         loadSpecifiedBijin bijinId, count, doAppend
@@ -176,16 +178,16 @@ parseBijinIdInPath = ->
     paths.length is 3 and paths[1] is "bijin" and /\d+/.test paths[2]
     paths[2] || undefined
 
-app.count = parseInt(localStorage.getItem("count") || app.count)
-app.itemWidth = parseInt(localStorage.getItem("itemWidth") || app.itemWidth)
-if app.count is 0
-    widthNum = $(window).width() / app.itemWidth
-    heightNum = ($(window).height() - 72) / app.itemWidth
-    app.count = ~~(widthNum * heightNum)
-    app.count = MIN_COUNT if app.count < MIN_COUNT
+bihyaku.count = parseInt(localStorage.getItem("count") || bihyaku.count)
+bihyaku.itemWidth = parseInt(localStorage.getItem("itemWidth") || bihyaku.itemWidth)
+if bihyaku.count is 0
+    widthNum = $(window).width() / bihyaku.itemWidth
+    heightNum = ($(window).height() - 72) / bihyaku.itemWidth
+    bihyaku.count = ~~(widthNum * heightNum)
+    bihyaku.count = MIN_COUNT if bihyaku.count < MIN_COUNT
 
-app.highQuality = !!(localStorage.getItem("high-quality") || app.highQuality)
-app.bijin = JSON.parse(localStorage.getItem("bijin") || "{}")
+bihyaku.highQuality = !!(localStorage.getItem("high-quality") || bihyaku.highQuality)
+bihyaku.bijin = JSON.parse(localStorage.getItem("bijin") || "{}")
 
 $(".js-today").text today()
 
@@ -202,8 +204,8 @@ $(".reload").click (e) ->
     e.preventDefault()
     gase? "reload", "click", "reload"
     localStorage.removeItem "bijin"
-    app.bijin = {}
-    loadBijin app.count, false
+    bihyaku.bijin = {}
+    loadBijin bihyaku.count, false
 
 $(document).on "click", ".js-bjinme", (e) ->
     id = $(@).data "id"
@@ -231,14 +233,34 @@ $(document).on "click", ".js-photo", (e) ->
 
 $(document).on "click", ".js-loadmore", (e) ->
     e.preventDefault()
-    loadBijin app.count, true
+    loadBijin bihyaku.count, true
     gase? "loadmore", "click", location.pathname
+
+$("#js-search-field").autocomplete
+    source: (req, res) ->
+        regex = new RegExp req.term, "i"
+        $.getJSON "/data/bijin_list.json", (list) ->
+            res $.map(list, (item) ->
+                if regex.test item.name
+                    return {
+                        label: item.name
+                        value: item.id
+                    }
+                )
+    focus: (event, ui) ->
+        $("#js-search-field").val ui.item.label
+        return false
+    select: (event, ui) ->
+        $("#js-search-field").val ui.item.label
+        loadSpecifiedBijin ui.item.value
+        gase? "search", "click", ui.item.label
+        return false
 
 popped = window.history.state?
 initialUrl = location.href
 $(window).on "popstate", (e) =>
     initialPop = !popped and location.href is initialUrl
     popped = true
-    loadBijin app.count, false if !initialPop
+    loadBijin bihyaku.count, false if !initialPop
 
 loadBijin()
