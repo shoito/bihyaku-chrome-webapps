@@ -215,6 +215,8 @@ module.exports = (grunt) ->
           "<%= yeoman.app %>/components/imagesloaded/imagesloaded.js"
           "<%= yeoman.app %>/scripts/jquery-ui-1.10.3.custom.min.js"
           "<%= yeoman.app %>/scripts/jquery.wookmark.js"
+          "<%= yeoman.app %>/scripts/jquery.sidr.min.js"
+          "<%= yeoman.app %>/scripts/bijin-list.js"
           ".tmp/scripts/bijin.js"
         ]
         dest: ".tmp/scripts/main.js"
