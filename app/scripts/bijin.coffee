@@ -1,5 +1,4 @@
-bihyaku = bihyaku || {}
-window.bihyaku = bihyaku
+window.bihyaku = bihyaku = window.bihyaku || {}
 bihyaku.count = 0
 bihyaku.itemWidth = if screen.width > 480 then 220 else 150
 bihyaku.highQuality = true
@@ -92,26 +91,25 @@ loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
         $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
 
     document.title = "美人百景"
-    $title.text "今日の美人百景"
+    $title.text "今日の"
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
     if !doAppend and bihyaku.bijin?.timestamp is today()
         renderBijin bihyaku.bijin.data
+        setTimeout (-> loadRelatedVideos $.map(bihyaku.bijin.data, (data) -> data.category)), 600
     else
-        xhr = new XMLHttpRequest()
-        xhr.open "GET", "http://bjin.me/api/?format=json&count=#{count}&type=rand", true
-        xhr.onreadystatechange = ->
-            return unless xhr.readyState is 4
-            bijinData
+        $.ajax
+            url: "http://bjin.me/api/?format=json&count=#{count}&type=rand"
+        .done (json) ->
             try
-                bijinData = JSON.parse xhr.responseText
+                bijinData = JSON.parse json
                 history.pushState {}, "", "/" if window.history?.pushState? and location.pathname isnt "/"
                 renderBijin bijinData
                 bihyaku.bijin = JSON.stringify({data: bijinData, timestamp: today()})
                 localStorage.setItem "bijin", bihyaku.bijin if !doAppend
+                setTimeout (-> loadRelatedVideos $.map(bijinData, (data) -> data.category)), 600
             catch e
                 handleError e
-        xhr.send()
 
 loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
     if !doAppend
@@ -120,26 +118,28 @@ loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
         $photosContainer.height "auto"
     else
         $loadMoreBtn.text("必死に探してます").addClass("pure-button-disabled").show()
+
     $loading.fadeIn("fast") if $loading.is ":hidden"
 
-    xhr = new XMLHttpRequest()
-    xhr.open "GET", "http://bjin.me/api/?type=detail&count=#{count}&format=json&id=#{bijinId}", true
-    xhr.onreadystatechange = ->
-        return unless xhr.readyState is 4
+    $.ajax
+        url: "http://bjin.me/api/?type=detail&count=#{count}&format=json&id=#{bijinId}"
+    .done (json) ->
         bijinData
         try
-            bijinData = JSON.parse xhr.responseText
+            bijinData = JSON.parse json
         catch e
             handleError e
 
         if bijinData?.length > 0
             bijin = bijinData[0]
-            $title.text document.title = "#{bijin.category}の美人百景" if bijin.category isnt ""
+            $title.text document.title = "#{bijin.category}の" if bijin.category isnt ""
             history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
+            setTimeout (-> loadRelatedVideos [bijin.category]), 600
         else
             $loading.hide()
-    xhr.send()
+    .fail ->
+        $loading.hide()
 
 loadBijin = (count = bihyaku.count, doAppend = false) ->
     bijinId = parseBijinIdInPath()
@@ -148,6 +148,50 @@ loadBijin = (count = bihyaku.count, doAppend = false) ->
     else
         loadUnspecifiedBijin count, doAppend
 
+loadRelatedVideos = (categories) ->
+    $(".js-videos").find("li").remove()
+    category = categories.join " | "
+    $.ajax
+        url: "http://api.search.nicovideo.jp/api/"
+        type: "POST"
+        data: """
+                {
+                   "query":"#{category}",
+                   "service":["video"],
+                   "search":["tags"],
+                   "join":[
+                      "cmsid",
+                      "title",
+                      "thumbnail_url"
+                   ],
+                   "filters":[],
+                   "sort_by":"_popular",
+                   "from":0,
+                   "size":10,
+                   "issuer":"bihyaku",
+                   "reason":"ma9"
+                }
+            """
+    .always (data) ->
+        chunks = data?.responseText?.split "\n"
+        $.map chunks, (chunk) ->
+            json = JSON.parse chunk if chunk isnt ""
+            if json?.type is "hits" and json.values?
+                renderVideos json.values
+                return
+
+renderVideos = (videoData) ->
+    $videos = $(".js-videos")
+    for video in videoData
+        $videos.append """
+        <li class="video-container">
+            <a href="http://www.nicovideo.jp/watch/#{video.cmsid}" class="js-video" target="_blank">
+                <img class="video-thumbnail" src="#{video.thumbnail_url}">
+                <p class="video-title">#{video.title}</p>
+            </a>
+        </li>
+        """
+
 searchBijin = (category, callback) =>
     $loading.fadeIn "fast"
 
@@ -155,13 +199,12 @@ searchBijin = (category, callback) =>
         callback bijinId
         return
 
-    xhr = new XMLHttpRequest()
-    xhr.open "GET", "http://bjin.me/api/?type=search&count=1&format=json&query=#{category}", true
-    xhr.onreadystatechange = ->
-        return unless xhr.readyState is 4
+    $.ajax
+        url: "http://bjin.me/api/?type=search&count=1&format=json&query=#{category}"
+    .done (json) ->
         bijinId
         try
-            bijinId = JSON.parse(xhr.responseText)[0]?.id
+            bijinId = JSON.parse(json)[0]?.id
         catch e
             handleError e
 
@@ -171,7 +214,8 @@ searchBijin = (category, callback) =>
 
         localStorage.setItem("category-" + encodeURIComponent(category), bijinId)
         callback bijinId if callback?
-    xhr.send()
+    .fail ->
+        $loading.hide()
 
 parseBijinIdInPath = ->
     paths = location.pathname.split "/"
@@ -239,14 +283,13 @@ $(document).on "click", ".js-loadmore", (e) ->
 $("#js-search-field").autocomplete
     source: (req, res) ->
         regex = new RegExp req.term, "i"
-        $.getJSON "/data/bijin_list.json", (list) ->
-            res $.map(list, (item) ->
-                if regex.test item.name
-                    return {
-                        label: item.name
-                        value: item.id
-                    }
-                )
+        res $.map(bihyaku.bijinList, (item) ->
+            if regex.test item.name
+                return {
+                    label: item.name
+                    value: item.id
+                }
+            )
     focus: (event, ui) ->
         $("#js-search-field").val ui.item.label
         return false
@@ -262,5 +305,16 @@ $(window).on "popstate", (e) =>
     initialPop = !popped and location.href is initialUrl
     popped = true
     loadBijin bihyaku.count, false if !initialPop
+
+$("#expand").sidr
+    name: "sidr"
+    side: "right"
+    source: ->
+        """
+        <header>
+            <h1 class="related-title"><i class="btn-niconico"></i>関連動画</h1>
+        </header>
+        <ul class="js-videos"></ul>
+        """
 
 loadBijin()
