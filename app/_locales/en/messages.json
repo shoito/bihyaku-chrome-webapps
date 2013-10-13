@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Beauty Views",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "It's the service that can look at a beautiful woman, a pretty woman as much as desired magnificently anytime.",
+    "description": "The description of the application"
+  }
+}
