@@ -14,7 +14,7 @@
 
 #### スクリーンショット
 
-![美人百景](https://raw.github.com/shoito/bihyaku-chrome-webapps/master/elements/ss00.jpg)
+![美人百景](https://raw.github.com/shoito/bihyaku-chrome-webapps/master/elements/usecase-sceen.png)
 
 
 ## Todo
