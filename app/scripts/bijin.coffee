@@ -132,7 +132,9 @@ loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
 
         if bijinData?.length > 0
             bijin = bijinData[0]
-            $title.text document.title = "#{bijin.category}の" if bijin.category isnt ""
+            if bijin.category isnt ""
+                $title.text "#{bijin.category}の"
+                document.title = "#{$title.text()}美人百景"
             history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
             setTimeout (-> loadRelatedVideos [bijin.category]), 600
