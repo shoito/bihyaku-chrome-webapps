@@ -76,12 +76,6 @@ module.exports = (grunt) ->
 
       server: ".tmp"
 
-    jshint:
-      options:
-        jshintrc: ".jshintrc"
-
-      all: ["Gruntfile.js", "<%= yeoman.app %>/scripts/{,*/}*.js", "test/spec/{,*/}*.js"]
-
     mocha:
       all:
         options:
@@ -254,4 +248,4 @@ module.exports = (grunt) ->
     ]
   grunt.registerTask "test", ["clean:server", "concurrent:test", "connect:test", "mocha"]
   grunt.registerTask "build", ["clean:dist", "useminPrepare", "concurrent:dist", "concat", "uglify", "copy:coffee", "copy:dist", "rev", "usemin", "compress"]
-  grunt.registerTask "default", ["jshint", "test", "build"]
+  grunt.registerTask "default", ["test", "build"]
