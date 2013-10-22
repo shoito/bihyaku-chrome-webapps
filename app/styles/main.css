@@ -49,6 +49,10 @@ footer a {
     color: #222;
 }
 
+.sidr ul li a, .sidr ul li span {
+    padding: 4px;
+}
+
 .head-line {
     margin: 0 90px 0 0;
     color: #333;
@@ -98,7 +102,7 @@ footer a {
     /*opacity: 0.1;*/
 }
 
-.photo-container, .video-container {
+.photo-container, .related-content-container {
     background-color: #ffffff;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -224,24 +228,24 @@ footer a {
     box-shadow: none !important;
 }
 
-.video-container {
+.related-content-container {
     padding: 4px;
     line-height: 1.5 !important;
 }
 
-.video-container:hover {
+.related-content-container:hover {
     border-top: 1px solid #fff !important;
     line-height: 1.5 !important;
 }
 
-.video-title {
+.related-content-title {
     line-height: 1.5 !important;
     font-size: 0.86em !important;
     overflow: hidden;
     padding: 0;
 }
 
-.video-thumbnail {
+.related-content-thumbnail {
     border: 2px solid #333;
 }
 

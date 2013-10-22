@@ -96,7 +96,7 @@ loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
 
     if !doAppend and bihyaku.bijin?.timestamp is today()
         renderBijin bihyaku.bijin.data
-        setTimeout (-> loadRelatedVideos $.map(bihyaku.bijin.data, (data) -> data.category)), 600
+        setTimeout (-> loadRelatedContents $.map(bihyaku.bijin.data, (data) -> data.category)), 600
     else
         $.ajax
             url: "http://bjin.me/api/?format=json&count=#{count}&type=rand"
@@ -107,7 +107,7 @@ loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
                 renderBijin bijinData
                 bihyaku.bijin = JSON.stringify({data: bijinData, timestamp: today()})
                 localStorage.setItem "bijin", bihyaku.bijin if !doAppend
-                setTimeout (-> loadRelatedVideos $.map(bijinData, (data) -> data.category)), 600
+                setTimeout (-> loadRelatedContents $.map(bijinData, (data) -> data.category)), 600
             catch e
                 handleError e
 
@@ -137,7 +137,7 @@ loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
                 document.title = "#{$title.text()}美人百景"
             history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
-            setTimeout (-> loadRelatedVideos [bijin.category]), 600
+            setTimeout (-> loadRelatedContents [bijin.category]), 600
         else
             $loading.hide()
     .fail ->
@@ -150,8 +150,8 @@ loadBijin = (count = bihyaku.count, doAppend = false) ->
     else
         loadUnspecifiedBijin count, doAppend
 
-loadRelatedVideos = (categories) ->
-    $(".js-videos").find("li").remove()
+loadRelatedContents = (categories) ->
+    $(".js-related").find("li").remove()
     category = categories.join " | "
     $.ajax
         url: "http://api.search.nicovideo.jp/api/"
@@ -159,17 +159,22 @@ loadRelatedVideos = (categories) ->
         data: """
                 {
                    "query":"#{category}",
-                   "service":["video"],
+                   "service":["video", "live", "book"],
                    "search":["tags"],
                    "join":[
                       "cmsid",
                       "title",
-                      "thumbnail_url"
+                      "thumbnail_url",
+                      "community_icon"
                    ],
-                   "filters":[],
-                   "sort_by":"_popular",
+                   "filters":[{
+                      "type":"equal",
+                      "field":"ss_adult",
+                      "value":false
+                   }],
+                   "sort_by":"_explore",
                    "from":0,
-                   "size":10,
+                   "size":20,
                    "issuer":"bihyaku",
                    "reason":"ma9"
                 }
@@ -179,20 +184,33 @@ loadRelatedVideos = (categories) ->
         $.map chunks, (chunk) ->
             json = JSON.parse chunk if chunk isnt ""
             if json?.type is "hits" and json.values?
-                renderVideos json.values
+                renderContents json.values
                 return
 
-renderVideos = (videoData) ->
-    $videos = $(".js-videos")
-    for video in videoData
-        $videos.append """
-        <li class="video-container">
-            <a href="http://www.nicovideo.jp/watch/#{video.cmsid}" class="js-video" target="_blank">
-                <img class="video-thumbnail" src="#{video.thumbnail_url}">
-                <p class="video-title">#{video.title}</p>
+renderContents = (contents) ->
+    $container = $(".js-related-contents")
+    $container.empty()
+    for content in contents
+        $container.append """
+        <li class="related-content-container">
+            <a href="#{getRelatedContentLink content}" class="js-related-content" target="_blank">
+                <img class="related-content-thumbnail" src="#{content.thumbnail_url || content.community_icon}">
+                <p class="related-content-title">#{getRelatedContentTitle content}</p>
             </a>
         </li>
         """
+
+getRelatedContentLink = (content) ->
+    switch content.service
+        when "live" then "http://live.nicovideo.jp/watch/#{content.cmsid}"
+        when "book" then "http://seiga.nicovideo.jp/watch/#{content.cmsid}"
+        else "http://www.nicovideo.jp/watch/#{content.cmsid}"
+
+getRelatedContentTitle = (content) ->
+    switch content.service
+        when "live" then "[Live] #{content.title}"
+        when "book" then "[Book] #{content.title}"
+        else "[Video] #{content.title}"
 
 searchBijin = (category, callback) =>
     $loading.fadeIn "fast"
@@ -314,9 +332,9 @@ $("#expand").sidr
     source: ->
         """
         <header>
-            <h1 class="related-title"><i class="btn-niconico"></i>関連動画</h1>
+            <h1 class="related-title"><i class="btn-niconico"></i>関連コンテンツ</h1>
         </header>
-        <ul class="js-videos"></ul>
+        <ul class="js-related-contents"></ul>
         """
 
 loadBijin()
