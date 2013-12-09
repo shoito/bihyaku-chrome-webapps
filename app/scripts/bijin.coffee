@@ -336,5 +336,7 @@ $("#expand").sidr
         </header>
         <ul class="js-related-contents"></ul>
         """
+    onOpen: ->
+        gase? "related", "click"
 
 loadBijin()
