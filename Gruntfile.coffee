@@ -238,6 +238,13 @@ module.exports = (grunt) ->
           dest: ""
         ]
 
+    gae:
+      deploy:
+        action: "update"
+        options:
+          path: "dist"
+          version: "grunt"
+
   grunt.renameTask "regarde", "watch"
   grunt.registerTask "server", (target) ->
     grunt.task.run [
