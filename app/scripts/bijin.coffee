@@ -151,6 +151,8 @@ loadBijin = (count = bihyaku.count, doAppend = false) ->
         loadUnspecifiedBijin count, doAppend
 
 loadRelatedContents = (categories) ->
+    return unless $(".js-expand").is(":visible")
+
     $(".js-related").find("li").remove()
     category = categories.join " | "
     $.ajax
