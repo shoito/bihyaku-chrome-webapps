@@ -1,6 +1,9 @@
 User-agent: *
 Allow: /$
-Disallow: /
+Disallow:
 
 User-agent: Mediapartners-Google
+Disallow:
+
+User-agent: Twitterbot
 Disallow:
