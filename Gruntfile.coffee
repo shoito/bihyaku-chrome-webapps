@@ -13,16 +13,17 @@ mountFolder = (connect, dir) ->
 # use this if you want to match all subfolders:
 # 'test/spec/**/*.js'
 module.exports = (grunt) ->
-  
+
   # load all grunt tasks
   require("matchdep").filterDev("grunt-*").forEach grunt.loadNpmTasks
-  
+
   # configurable paths
   yeomanConfig =
     app: "app"
     dist: "dist"
 
   grunt.initConfig
+    # env: require "./.env.json"
     yeoman: yeomanConfig
     watch:
       html:
@@ -154,7 +155,7 @@ module.exports = (grunt) ->
     htmlmin:
       dist:
         options: {}
-        
+
         #removeCommentsFromCDATA: true,
         #                    // https://github.com/yeoman/grunt-usemin/issues/44
         #                    //collapseWhitespace: true,
@@ -171,7 +172,7 @@ module.exports = (grunt) ->
           dest: "<%= yeoman.dist %>"
         ]
 
-    
+
     # Put files not handled in other tasks here
     copy:
       coffee:
@@ -239,11 +240,52 @@ module.exports = (grunt) ->
         ]
 
     gae:
+      dev_deploy:
+        action: "update"
+        options:
+          path: "dist"
+          version: "dev"
       deploy:
         action: "update"
         options:
           path: "dist"
-          version: "grunt"
+
+    pagespeed:
+      options:
+        # key: "<%= env.pagespeed.key %>"
+        nokey: true
+        url: "http://bihyaku.appspot.com"
+        locale: "ja_JP"
+        strategy: "desktop"
+        threshold: 70
+      desktop:
+        options:
+          paths: ["/"]
+      mobile:
+        options:
+          paths: ["/"]
+          strategy: "mobile"
+      dev_desktop:
+        options:
+          url: "http://<%= gae.dev_deploy.options.version %>.bihyaku.appspot.com"
+      dev_mobile:
+        options:
+          url: "http://<%= gae.dev_deploy.options.version %>.bihyaku.appspot.com"
+          strategy: "mobile"
+
+    githooks:
+      options:
+        dest: ".git/hooks"
+        hashbang: "#!/bin/sh"
+        template: "./node_modules/grunt-githooks/templates/shell.hb"
+        startMarker: "## GRUNT-GRUNTHOOKS START"
+        endMarker: "## GRUNT-GRUNTHOOKS END"
+      dist:
+        "pre-commit": "pre-commit"
+        "pre-push": "pre-push"
+
+  grunt.registerTask "pre-commit", []
+  grunt.registerTask "pre-push", ["pagespeed:dev_desktop", "pagespeed:dev_mobile"]
 
   grunt.renameTask "regarde", "watch"
   grunt.registerTask "server", (target) ->
