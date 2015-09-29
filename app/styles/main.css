@@ -9,7 +9,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 }
 body {
     /*font-family: "メイリオ", Meiryo, "ＭＳ Ｐゴシック", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", sans-serif;*/
-    font-family: "MS PMincho", "ＭＳ Ｐ明朝", "MS Mincho", "ＭＳ 明朝", serif; 
+    font-family: "MS PMincho", "ＭＳ Ｐ明朝", "MS Mincho", "ＭＳ 明朝", serif;
     font-size: 13px;
     width: 100%;
     background-color: #e9e9e9;
@@ -47,10 +47,6 @@ footer {
 }
 footer a {
     color: #222;
-}
-
-.sidr ul li a, .sidr ul li span {
-    padding: 4px;
 }
 
 .head-line {
@@ -102,7 +98,7 @@ footer a {
     /*opacity: 0.1;*/
 }
 
-.photo-container, .related-content-container {
+.photo-container {
     background-color: #ffffff;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -215,49 +211,6 @@ footer a {
     width: 128px;
 }
 
-.related-container {
-    width: 200px;
-}
-
-.related-title {
-    margin: 20px 18px 6px 0 !important;
-    text-align: center;
-    padding: 0 !important;
-    font-size: 1.1em !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-.related-content-container {
-    padding: 4px;
-    line-height: 1.5 !important;
-}
-
-.related-content-container:hover {
-    border-top: 1px solid #fff !important;
-    line-height: 1.5 !important;
-}
-
-.related-content-title {
-    line-height: 1.5 !important;
-    font-size: 0.86em !important;
-    overflow: hidden;
-    padding: 0;
-}
-
-.related-content-thumbnail {
-    border: 2px solid #333;
-}
-
-.related-container .btn-niconico {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 3px 6px 0 0;
-    width: 18px;
-    height: 18px;
-    background-repeat: no-repeat;
-}
-
 @media screen and (max-width: 1000px) {
     .title-wrapper {
         display: block;
@@ -290,4 +243,3 @@ footer a {
 
 @media screen and (max-width: 480px) {
 }
-

@@ -43,8 +43,8 @@ renderBijin = (bijinData) ->
                 <i class="icon-heart"></i>
             </a>
             <a href="#" class="js-photo" title="#{bijin.category}の写真をもっと見る" >
-                <img data-id="#{bijin.id}" data-category="#{bijin.category}" 
-                    data-pub-data="#{bijin.pubDate}" data-hq-thumb="#{hqThumbnail}" 
+                <img data-id="#{bijin.id}" data-category="#{bijin.category}"
+                    data-pub-data="#{bijin.pubDate}" data-hq-thumb="#{hqThumbnail}"
                     data-lq-thumb="#{lqThunbnail}" src="#{thumbnail}">
             </a>
             <div class="js-controls controls #{bihyaku.controlVisibleClass}">
@@ -96,7 +96,6 @@ loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
 
     if !doAppend and bihyaku.bijin?.timestamp is today()
         renderBijin bihyaku.bijin.data
-        setTimeout (-> loadRelatedContents $.map(bihyaku.bijin.data, (data) -> data.category)), 600
     else
         $.ajax
             url: "http://bjin.me/api/?format=json&count=#{count}&type=rand"
@@ -107,7 +106,6 @@ loadUnspecifiedBijin = (count = bihyaku.count, doAppend = false) ->
                 renderBijin bijinData
                 bihyaku.bijin = JSON.stringify({data: bijinData, timestamp: today()})
                 localStorage.setItem "bijin", bihyaku.bijin if !doAppend
-                setTimeout (-> loadRelatedContents $.map(bijinData, (data) -> data.category)), 600
             catch e
                 handleError e
 
@@ -137,7 +135,6 @@ loadSpecifiedBijin = (bijinId, count = bihyaku.count, doAppend = false) ->
                 document.title = "#{$title.text()}美人百景"
             history.pushState {id: bijinId, category: bijin.category}, "", "/bijin/#{bijinId}" if window.history?.pushState? and location.pathname isnt "/bijin/#{bijinId}"
             renderBijin bijinData
-            setTimeout (-> loadRelatedContents [bijin.category]), 600
         else
             $loading.hide()
     .fail ->
@@ -149,70 +146,6 @@ loadBijin = (count = bihyaku.count, doAppend = false) ->
         loadSpecifiedBijin bijinId, count, doAppend
     else
         loadUnspecifiedBijin count, doAppend
-
-loadRelatedContents = (categories) ->
-    return unless $(".js-expand").is(":visible")
-
-    $(".js-related").find("li").remove()
-    category = categories.join " | "
-    $.ajax
-        url: "http://api.search.nicovideo.jp/api/"
-        type: "POST"
-        data: """
-                {
-                   "query":"#{category}",
-                   "service":["video", "live", "book"],
-                   "search":["tags"],
-                   "join":[
-                      "cmsid",
-                      "title",
-                      "thumbnail_url",
-                      "community_icon"
-                   ],
-                   "filters":[{
-                      "type":"equal",
-                      "field":"ss_adult",
-                      "value":false
-                   }],
-                   "sort_by":"_explore",
-                   "from":0,
-                   "size":20,
-                   "issuer":"bihyaku",
-                   "reason":"ma9"
-                }
-            """
-    .always (data) ->
-        chunks = data?.responseText?.split "\n"
-        $.map chunks, (chunk) ->
-            json = JSON.parse chunk if chunk isnt ""
-            if json?.type is "hits" and json.values?
-                renderContents json.values
-                return
-
-renderContents = (contents) ->
-    $container = $(".js-related-contents")
-    $container.empty()
-    for content in contents
-        $container.append """
-        <li class="related-content-container">
-            <a href="#{getRelatedContentLink content}" class="js-related-content" target="_blank">
-                <img class="related-content-thumbnail" src="#{content.thumbnail_url || content.community_icon}">
-                <p class="related-content-title">#{getRelatedContentTitle content}</p>
-            </a>
-        </li>
-        """
-
-getRelatedContentLink = (content) ->
-    switch content.service
-        when "live" then "http://live.nicovideo.jp/watch/#{content.cmsid}"
-        when "book" then "http://seiga.nicovideo.jp/watch/#{content.cmsid}"
-        else "http://www.nicovideo.jp/watch/#{content.cmsid}"
-
-getRelatedContentTitle = (content) ->
-    switch content.service
-        when "live" then "[Live] #{content.title}"
-        when "book" then "[Book] #{content.title}"
-        else "[Video] #{content.title}"
 
 searchBijin = (category, callback) =>
     $loading.fadeIn "fast"
@@ -327,18 +260,5 @@ $(window).on "popstate", (e) =>
     initialPop = !popped and location.href is initialUrl
     popped = true
     loadBijin bihyaku.count, false if !initialPop
-
-$("#expand").sidr
-    name: "sidr"
-    side: "right"
-    source: ->
-        """
-        <header>
-            <h1 class="related-title"><i class="btn-niconico"></i>関連コンテンツ</h1>
-        </header>
-        <ul class="js-related-contents"></ul>
-        """
-    onOpen: ->
-        gase? "related", "click"
 
 loadBijin()
